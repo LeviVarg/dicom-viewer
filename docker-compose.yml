@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: dicom-viewer-db 
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: levi
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5332:5432" 
+    networks:
+      - db 
+      - app 
+    restart: unless-stopped
+
+  backend:
+    container_name: springboot-backend
+    build:
+      context: ./backend/dicom-viewer-backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: levi
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - app
+      - db
+    depends_on:
+      - db
+
+  go-service:
+    container_name: go-microservice
+    build:
+      context: ./services/
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - app
+      - db
+    depends_on:
+      - db
+
+  frontend:
+    container_name: nextjs-frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app
+    depends_on:
+      - backend 
+
+networks:
+  db:
+    driver: bridge
+  app:
+    driver: bridge
+
+volumes:
+  db:
