@@ -1,0 +1,18 @@
+# frontend/Dockerfile.dev
+
+# Use a clean Node image
+FROM node:20-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json only (for cache efficiency)
+COPY package*.json ./
+
+# Install dependencies
+# We don't build the app here, just install what's needed for 'npm run dev'
+RUN npm install
+
+# Expose the dev port
+EXPOSE 3000
+

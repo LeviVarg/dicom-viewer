@@ -1,0 +1,16 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/go-service ." # The build command
+bin = "tmp/go-service"                  # The compiled executable path
+delay = 150                             # Wait 150ms before rebuilding
+exclude_dir = ["tmp"]
+include_ext = ["go", "tpl", "tmpl", "html"]
+
+[log]
+time = false
+
+[server]
+# Command to run the newly compiled executable
+cmd = "./tmp/go-service"
