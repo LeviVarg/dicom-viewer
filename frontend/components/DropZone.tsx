@@ -20,7 +20,7 @@ export function DicomDropzone() {
   return (
     <Card
       {...getRootProps()}
-      className={`border-2 border-dashed transition-colors 
+      className={`border-2 border-dashed transition-colors w-xl h-2xl 
         ${isDragActive ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}
       `}
     >
