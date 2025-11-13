@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Upload } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { fileUpload } from '@/app/upload/fileupload.actions';
 
-interface DicomDropzoneProps {
-  onFilesAccepted: (files: File[]) => void;
-}
+// interface DicomDropzoneProps {
+//   onFilesAccepted: (files: File[]) => void;
+// }
 
-export function DicomDropzone({ onFilesAccepted }: DicomDropzoneProps) {
+export function DicomDropzone() {
   const [files, setFiles] = useState<File[]>([]);
 
 
@@ -20,7 +21,6 @@ export function DicomDropzone({ onFilesAccepted }: DicomDropzoneProps) {
     if (acceptedFiles.length > 0) {
       setFiles((prev) => ([...prev, ...acceptedFiles]));
 
-      onFilesAccepted(acceptedFiles);
     }
 
     if (fileRejections.length > 0) {
@@ -31,7 +31,7 @@ export function DicomDropzone({ onFilesAccepted }: DicomDropzoneProps) {
         duration: 5000,
       });
     }
-  }, [onFilesAccepted]);
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
@@ -40,6 +40,23 @@ export function DicomDropzone({ onFilesAccepted }: DicomDropzoneProps) {
       'application/dicom': ['.dcm'],
     },
   });
+
+  async function uploadAction() {
+    if (!(files.length > 0)) {
+      toast.error(`No files to upload`, { duration: 5000 })
+    }
+
+    const data = await fileUpload(files);
+
+    if (!data.success) {
+      toast.error(`Error uploading files: ${data.message}`, { duration: 5000 })
+    } else {
+      toast.success(`Succes uploading: ${data.message}`, { duration: 5000 })
+      console.log(data)
+    }
+
+    setFiles([]);
+  }
 
 
   return (
