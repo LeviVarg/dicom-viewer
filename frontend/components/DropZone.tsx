@@ -68,7 +68,7 @@ export function DicomDropzone() {
         ${files.length > 0 ? 'min-h-[100px]' : ''}
       `}
     >
-      <CardContent className="flex flex-col items-center justify-center p-6 w-4xl h-4xl">
+      <CardContent className="flex flex-col gap-3 items-center justify-center p-6 w-4xl h-4xl">
         <Input {...getInputProps()} />
 
         {files.length > 0 ? (
@@ -107,6 +107,17 @@ export function DicomDropzone() {
           onClick={open}
         >
           Browse Files
+        </div>
+
+        <div className='flex gap-5'>
+          <button onClick={uploadAction} className="px-4 py-2 bg-blue-400 rounded-md text-small hover:bg-blue-500 text-white">
+            Upload
+          </button>
+
+          <button onClick={() => setFiles([])} className="px-4 py-2 bg-blue-400 rounded-md text-small hover:bg-blue-500 text-white">
+            Clear files
+          </button>
+
         </div>
 
       </CardContent>
