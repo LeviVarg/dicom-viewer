@@ -39,8 +39,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: levi
       SPRING_DATASOURCE_PASSWORD: password
-      DICOM_UPLOAD_PATH: /data/dicom-uploads
-      GO_SERVICE_URL: http://go-service-8081
+      DICOM_UPLOAD_PATH: /dicom-uploads
+      GO_SERVICE_URL: http://go-service:8081
     networks:
       - app
       - db
