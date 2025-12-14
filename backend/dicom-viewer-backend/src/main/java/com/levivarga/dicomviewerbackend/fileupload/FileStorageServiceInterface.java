@@ -14,7 +14,8 @@ public interface FileStorageServiceInterface {
      * Stores a single file to the designated storage location.
      *
      * @param file The MultipartFile to be stored.
+     * @return String The path to the file
      * @throws StorageException if the file cannot be stored.
      */
-    void store(MultipartFile file) throws StorageException;
+    String store(MultipartFile file) throws StorageException;
 }
