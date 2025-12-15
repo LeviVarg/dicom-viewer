@@ -74,7 +74,12 @@ services:
       - app
     depends_on:
       - backend
-
+    environment:
+      # Server-side API calls use Docker service name (inside Docker network)
+      NEXT_PUBLIC_API_BASE_URL: http://springboot-backend:8080/api
+      BACKEND_URL: http://springboot-backend:8080
+      # Client-side API calls use localhost (browser is outside Docker network)
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:8080
     volumes:
       - ./frontend:/app
       - /app/node_modules
