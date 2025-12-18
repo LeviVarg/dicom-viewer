@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 # Build the application statically linked against C library
-RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /go-service ./main.go # <--- Update path to your main package
+RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /go-service ./main.go
 
 # Stage 2: Create a minimal production image
 FROM alpine:latest

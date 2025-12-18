@@ -1,20 +1,18 @@
-version: '3.8'
-
 services:
   db:
-    container_name: dicom-viewer-db 
+    container_name: dicom-viewer-db
     image: postgres:latest
     environment:
-      POSTGRES_USER: levi
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /data/postgres
     volumes:
       - db:/data/postgres
     ports:
-      - "5332:5432" 
+      - "5432:5432"
     networks:
-      - db 
-      - app 
+      - db
+      - app
     restart: unless-stopped
 
   backend:
@@ -22,15 +20,16 @@ services:
     # build:
     #   context: ./backend/dicom-viewer-backend/
     #   dockerfile: Dockerfile
-    image: maven:3.9.6-eclipse-temurin-21 
+    image: maven:3.9.6-eclipse-temurin-21
 
     command: ["mvn", "spring-boot:run"]
     ports:
       - "8080:8080"
 
     volumes:
-    - ./backend/dicom-viewer-backend:/usr/src/app # Mount project root
-    - ~/.m2:/root/.m2                             # Mount local Maven cache for speed
+      - ./backend/dicom-viewer-backend:/usr/src/app # Mount project root
+      - ~/.m2:/root/.m2 # Mount local Maven cache for speed
+      - ./backend/dicom-viewer-backend/dicom-uploads:/data/dicom-uploads
 
     working_dir: /usr/src/app
 
@@ -38,6 +37,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: levi
       SPRING_DATASOURCE_PASSWORD: password
+      DICOM_UPLOAD_PATH: /data/dicom-uploads
+      GO_SERVICE_URL: http://go-service:8081
     networks:
       - app
       - db
@@ -53,6 +54,7 @@ services:
       - "8081:8081"
     volumes:
       - ./services:/app
+      - ./backend/dicom-viewer-backend/dicom-uploads:/data/dicom-uploads
     networks:
       - app
       - db
@@ -69,12 +71,17 @@ services:
     networks:
       - app
     depends_on:
-      - backend 
-
+      - backend
+    environment:
+      # Server-side API calls use Docker service name (inside Docker network)
+      NEXT_PUBLIC_API_BASE_URL: http://springboot-backend:8080/api
+      BACKEND_URL: http://springboot-backend:8080
+      # Client-side API calls use localhost (browser is outside Docker network)
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:8080
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: ["npm","run","dev"]
+    command: ["npm", "run", "dev"]
 
 networks:
   db:
