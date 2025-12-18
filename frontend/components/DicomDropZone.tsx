@@ -7,7 +7,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { fileUpload } from "@/app/upload/fileupload.actions";
 
-// Maximum size per batch in bytes (slightly under 1MB to be safe)
+// Maximum size per batch in bytes since nextjs only allows 1mb per request
 const MAX_BATCH_SIZE = 900 * 1024; // 900KB
 
 interface UploadProgress {
@@ -27,8 +27,6 @@ function splitFilesIntoBatches(files: File[], maxBatchSize: number): File[][] {
   let currentBatchSize = 0;
 
   for (const file of files) {
-    // If adding this file would exceed the limit, start a new batch
-    // (unless the current batch is empty, which means this single file is larger than the limit)
     if (
       currentBatchSize + file.size > maxBatchSize &&
       currentBatch.length > 0
@@ -49,7 +47,7 @@ function splitFilesIntoBatches(files: File[], maxBatchSize: number): File[][] {
     }
   }
 
-  // Don't forget the last batch
+  // last batch
   if (currentBatch.length > 0) {
     batches.push(currentBatch);
   }
@@ -113,7 +111,7 @@ export function DicomDropzone() {
     let errorCount = 0;
     const errors: string[] = [];
 
-    // Upload each batch sequentially
+    // Upload each batch 
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       const batchNumber = i + 1;
@@ -147,7 +145,6 @@ export function DicomDropzone() {
       isUploading: false,
     });
 
-    // Show summary toast
     if (errorCount === 0) {
       toast.success(
         `Successfully uploaded ${files.length} files in ${totalBatches} batch${totalBatches > 1 ? "es" : ""}`,
