@@ -215,17 +215,6 @@ public class DicomPersistenceService {
             return existingInstance.get();
         }
 
-        // Also check by file path to prevent duplicates from re-uploads
-        Optional<Instance> existingByPath = instanceRepository
-                .findByFilePath(parsedInstance.getFilePath());
-
-        if (existingByPath.isPresent()) {
-            log.debug("Found existing instance by file path: {}", existingByPath.get().getId());
-            // Update the SOP Instance UID if it changed
-            Instance instance = existingByPath.get();
-            instance.setSopInstanceUid(parsedInstance.getSopInstanceUid());
-            return instanceRepository.save(instance);
-        }
 
         // Create new instance
         Instance instance = Instance.builder()

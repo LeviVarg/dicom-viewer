@@ -7,8 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,9 @@ public class FileStorageService implements FileStorageServiceInterface {
     // TODO: This should ideally be configurable in application.properties
     private final Path rootLocation;
 
-    public FileStorageService(@Value("${dicom.upload.path:/data/dicom-uploads}") String uploadPath) {
+    public FileStorageService(
+        @Value("${dicom.upload.path:/data/dicom-uploads}") String uploadPath
+    ) {
         this.rootLocation = Paths.get(uploadPath);
     }
 
@@ -39,6 +42,22 @@ public class FileStorageService implements FileStorageServiceInterface {
     }
 
     /**
+     * Generates a unique filename by prepending a timestamp to prevent file collisions.
+     *
+     * @param originalFilename The original filename from the uploaded file.
+     * @return A unique filename with timestamp prefix.
+     */
+    private String generateUniqueFilename(String originalFilename) {
+        // Format: yyyy-MM-dd_HH-mm-ss-SSS_originalFilename
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd_HH-mm-ss-SSS"
+        );
+        String timestamp = now.format(formatter);
+        return timestamp + "_" + originalFilename;
+    }
+
+    /**
      * Stores a file.
      *
      * @param file The file to store.
@@ -51,11 +70,14 @@ public class FileStorageService implements FileStorageServiceInterface {
                 throw new StorageException("Failed to store empty file.");
             }
 
+            // Generate a unique filename with timestamp prefix
+            String uniqueFilename = generateUniqueFilename(
+                Objects.requireNonNull(file.getOriginalFilename())
+            );
+
             // Resolve the final path for the file
             Path destinationFile = this.rootLocation.resolve(
-                    Paths.get(
-                        Objects.requireNonNull(file.getOriginalFilename())
-                    )
+                    Paths.get(uniqueFilename)
                 )
                 .normalize()
                 .toAbsolutePath();
@@ -72,9 +94,6 @@ public class FileStorageService implements FileStorageServiceInterface {
             }
 
             // Copy the file's input stream to the target path
-            // REPLACE_EXISTING ensures that if a file with the same name is uploaded,
-            // it will be overwritten.
-            // TODO: rewrite this to be structural
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(
                     inputStream,

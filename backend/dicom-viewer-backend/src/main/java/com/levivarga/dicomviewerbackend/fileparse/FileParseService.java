@@ -50,7 +50,7 @@ public class FileParseService implements FileParseServiceInterface {
             ResponseEntity<DicomParseResultDto> response =
                 restTemplate.postForEntity(
                     url,
-                    request,
+                    reuest,
                     DicomParseResultDto.class
                 );
             return response.getBody();
