@@ -2,8 +2,12 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { getPatients, getInstanceIdsForSeries } from "./actions/patientActions";
+import {
+  getPatients,
+  getInstanceIdsForSeries,
+} from "./actions/patients.actions";
 import { PatientDto, SeriesDto, StudyDto } from "@/lib/types";
+import { useTheme } from "@/lib/theme-context";
 
 // Dynamically import DicomViewer to avoid SSR issues with Cornerstone
 const DicomViewer = dynamic(() => import("@/components/DicomViewer"), {
@@ -23,6 +27,7 @@ interface SelectedSeries {
 }
 
 const PatientsPage: React.FC = () => {
+  const { theme } = useTheme();
   const [patients, setPatients] = useState<PatientDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,14 +101,11 @@ const PatientsPage: React.FC = () => {
     [],
   );
 
-  // Format patient name for display
   const formatPatientName = (name: string | null): string => {
     if (!name) return "Unknown";
-    // DICOM names are typically in format: LastName^FirstName^MiddleName
     return name.replace(/\^/g, ", ");
   };
 
-  // Format date for display
   const formatDate = (date: string | null): string => {
     if (!date) return "N/A";
     // DICOM dates are in format YYYYMMDD
@@ -115,10 +117,14 @@ const PatientsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        className={`min-h-screen flex items-center justify-center ${theme.colors.background}`}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4"></div>
-          <p className="text-black text-lg">Loading patients...</p>
+          <p className={`${theme.colors.text.primary} text-lg`}>
+            Loading patients...
+          </p>
         </div>
       </div>
     );
@@ -126,13 +132,15 @@ const PatientsPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p className="text-xl font-semibold mb-2">Error Loading Patients</p>
+      <div
+        className={`min-h-screen flex items-center justify-center ${theme.colors.background}`}
+      >
+        <div className={`text-center ${theme.colors.error}`}>
+          <p className={`text-xl font-semibold mb-2`}>Error Loading Patients</p>
           <p>{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-gray-200 text-black rounded-2xl hover:bg-gray-300 transition-colors"
+            className={`mt-4 px-4 py-2 ${theme.colors.button.background} ${theme.colors.button.text} rounded-2xl ${theme.colors.button.hover} transition-colors`}
           >
             Retry
           </button>
@@ -142,7 +150,9 @@ const PatientsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen text-black">
+    <div
+      className={`min-h-screen ${theme.colors.background} ${theme.colors.text.primary}`}
+    >
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">DICOM Patients</h1>
 
@@ -154,7 +164,9 @@ const PatientsPage: React.FC = () => {
             </h2>
 
             {patients.length === 0 ? (
-              <div className="bg-gray-100 rounded-2xl p-6 text-center text-gray-500">
+              <div
+                className={`${theme.colors.surface} rounded-2xl p-6 text-center ${theme.colors.text.secondary}`}
+              >
                 <p>No patients found.</p>
                 <p className="text-sm mt-2">
                   Upload DICOM files to get started.
@@ -165,12 +177,12 @@ const PatientsPage: React.FC = () => {
                 {patients.map((patient) => (
                   <div
                     key={patient.id}
-                    className="bg-gray-100 rounded-2xl overflow-hidden"
+                    className={`${theme.colors.surface} rounded-2xl overflow-hidden border ${theme.colors.border}`}
                   >
                     {/* Patient Header */}
                     <button
                       onClick={() => togglePatient(patient.id)}
-                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-200 transition-colors"
+                      className={`w-full px-4 py-3 flex items-center justify-between ${theme.colors.button.hover} transition-colors`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xl">
@@ -180,30 +192,34 @@ const PatientsPage: React.FC = () => {
                           <p className="font-medium">
                             {formatPatientName(patient.patientName)}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p
+                            className={`text-sm ${theme.colors.text.secondary}`}
+                          >
                             ID: {patient.patientDicomId || "N/A"} | DOB:{" "}
                             {formatDate(patient.patientBirthDate)} | Sex:{" "}
                             {patient.patientSex || "N/A"}
                           </p>
                         </div>
                       </div>
-                      <span className="text-sm text-gray-500">
+                      <span
+                        className={`text-sm ${theme.colors.text.secondary}`}
+                      >
                         {patient.studies.length} studies
                       </span>
                     </button>
 
                     {/* Studies */}
                     {expandedPatients.has(patient.id) && (
-                      <div className="border-t border-gray-200">
+                      <div className={`border-t ${theme.colors.border}`}>
                         {patient.studies.map((study) => (
                           <div
                             key={study.id}
-                            className="border-b border-gray-200 last:border-b-0"
+                            className={`border-b ${theme.colors.border} last:border-b-0`}
                           >
                             {/* Study Header */}
                             <button
                               onClick={() => toggleStudy(study.id)}
-                              className="w-full px-6 py-2 flex items-center justify-between hover:bg-gray-200 transition-colors"
+                              className={`w-full px-6 py-2 flex items-center justify-between ${theme.colors.button.hover} transition-colors`}
                             >
                               <div className="flex items-center gap-2">
                                 <span className="text-sm">
@@ -213,29 +229,33 @@ const PatientsPage: React.FC = () => {
                                   <p className="text-sm font-medium">
                                     {study.studyDescription || "Unnamed Study"}
                                   </p>
-                                  <p className="text-xs text-gray-500">
+                                  <p
+                                    className={`text-xs ${theme.colors.text.secondary}`}
+                                  >
                                     Date: {formatDate(study.studyDate)} | ID:{" "}
                                     {study.studyId || "N/A"}
                                   </p>
                                 </div>
                               </div>
-                              <span className="text-xs text-gray-500">
+                              <span
+                                className={`text-xs ${theme.colors.text.secondary}`}
+                              >
                                 {study.seriesList.length} series
                               </span>
                             </button>
 
                             {/* Series */}
                             {expandedStudies.has(study.id) && (
-                              <div className="bg-gray-50">
+                              <div className={theme.colors.surfaceAlt}>
                                 {study.seriesList.map((series) => (
                                   <button
                                     key={series.id}
                                     onClick={() =>
                                       handleSeriesClick(patient, study, series)
                                     }
-                                    className={`w-full px-8 py-2 flex items-center justify-between hover:bg-gray-200 transition-colors text-left ${
+                                    className={`w-full px-8 py-2 flex items-center justify-between ${theme.colors.button.hover} transition-colors text-left ${
                                       selectedSeries?.series.id === series.id
-                                        ? "bg-gray-200 border-l-2 border-gray-600"
+                                        ? `${theme.colors.accent.background} border-l-2 border-gray-600`
                                         : ""
                                     }`}
                                   >
@@ -244,12 +264,16 @@ const PatientsPage: React.FC = () => {
                                         {series.seriesDescription ||
                                           `Series ${series.seriesNumber || "N/A"}`}
                                       </p>
-                                      <p className="text-xs text-gray-500">
+                                      <p
+                                        className={`text-xs ${theme.colors.text.secondary}`}
+                                      >
                                         Modality: {series.modality || "N/A"} |{" "}
                                         {series.instances.length} images
                                       </p>
                                     </div>
-                                    <span className="text-gray-600 text-sm">
+                                    <span
+                                      className={`${theme.colors.text.secondary} text-sm`}
+                                    >
                                       View →
                                     </span>
                                   </button>
@@ -273,23 +297,27 @@ const PatientsPage: React.FC = () => {
             {selectedSeries ? (
               <div>
                 {/* Selected Series Info */}
-                <div className="bg-gray-100 rounded-t-2xl p-4 border-b border-gray-200">
+                <div
+                  className={`${theme.colors.surface} rounded-t-2xl p-4 border-b ${theme.colors.border}`}
+                >
                   <p className="font-medium">
                     {formatPatientName(selectedSeries.patient.patientName)}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className={`text-sm ${theme.colors.text.secondary}`}>
                     {selectedSeries.study.studyDescription || "Unnamed Study"} →{" "}
                     {selectedSeries.series.seriesDescription ||
                       `Series ${selectedSeries.series.seriesNumber || ""}`}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className={`text-xs ${theme.colors.text.muted} mt-1`}>
                     Modality: {selectedSeries.series.modality || "N/A"} |{" "}
                     {selectedSeries.instanceIds.length} images
                   </p>
                 </div>
 
                 {/* Viewer */}
-                <div className="bg-gray-100 rounded-b-2xl overflow-hidden">
+                <div
+                  className={`${theme.colors.surface} rounded-b-2xl overflow-hidden`}
+                >
                   <DicomViewer
                     instanceIds={selectedSeries.instanceIds}
                     height="512px"
@@ -298,8 +326,10 @@ const PatientsPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-gray-100 rounded-2xl h-[512px] flex items-center justify-center">
-                <div className="text-center text-gray-500">
+              <div
+                className={`${theme.colors.surface} rounded-2xl h-[512px] flex items-center justify-center`}
+              >
+                <div className={`text-center ${theme.colors.text.secondary}`}>
                   <p className="text-lg mb-2">No Series Selected</p>
                   <p className="text-sm">
                     Select a series from the patient list to view DICOM images

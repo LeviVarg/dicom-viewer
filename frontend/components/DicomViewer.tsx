@@ -17,6 +17,7 @@ import {
   buildWadoUriImageIds,
   getStackViewportType,
 } from "@/lib/cornerstone";
+import { useTheme } from "@/lib/theme-context";
 
 interface DicomViewerProps {
   /** Array of instance IDs to display in the viewer */
@@ -41,6 +42,7 @@ const DicomViewer: React.FC<DicomViewerProps> = ({
   onImageChange,
   onError,
 }) => {
+  const { theme } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -382,47 +384,55 @@ const DicomViewer: React.FC<DicomViewerProps> = ({
             alignItems: "center",
             justifyContent: "center",
             gap: "16px",
-            backgroundColor: "#f3f4f6",
+            backgroundColor: theme.colors.surface,
             padding: "0 16px",
           }}
         >
           <button
             onClick={goToPrevious}
             disabled={currentIndex === 0}
-            className="px-3 py-1 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition-colors"
+            className={`px-3 py-1 ${theme.colors.button.background} ${theme.colors.button.text} rounded-lg disabled:opacity-50 disabled:cursor-not-allowed ${theme.colors.button.hover} transition-colors`}
           >
             ← Previous
           </button>
 
-          <span className="text-black text-sm">
+          <span className={`${theme.colors.text.primary} text-sm`}>
             {currentIndex + 1} / {totalImages}
           </span>
 
           <button
             onClick={goToNext}
             disabled={currentIndex === instanceIds.length - 1}
-            className="px-3 py-1 bg-gray-200 text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition-colors"
+            className={`px-3 py-1 ${theme.colors.button.background} ${theme.colors.button.text} rounded-lg disabled:opacity-50 disabled:cursor-not-allowed ${theme.colors.button.hover} transition-colors`}
           >
             Next →
           </button>
 
-          <div className="border-l border-gray-300 h-6 mx-2" />
+          <div
+            style={{
+              borderLeft: `1px solid ${theme.mode === "dark" ? "#374151" : "#e5e7eb"}`,
+              height: "24px",
+              margin: "0 8px",
+            }}
+          />
 
           <button
             onClick={handleResetViewport}
-            className="px-3 py-1 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-colors"
+            className={`px-3 py-1 ${theme.colors.button.background} ${theme.colors.button.text} rounded-lg ${theme.colors.button.hover} transition-colors`}
           >
             Reset
           </button>
 
-          <span className="text-gray-500 text-xs ml-4">
+          <span className={`${theme.colors.text.secondary} text-xs ml-4`}>
             Arrow keys or mouse wheel to navigate
           </span>
         </div>
       )}
 
       {/* Tool Instructions */}
-      <div className="text-xs text-gray-500 py-2 text-center bg-gray-100">
+      <div
+        className={`text-xs ${theme.colors.text.secondary} py-2 text-center ${theme.colors.surface}`}
+      >
         Left click: Window/Level | Right click: Zoom | Middle click: Pan
       </div>
     </div>

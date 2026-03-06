@@ -23,11 +23,11 @@ func DicomParseHandler(context *gin.Context) {
 	for _, path := range parseRequest.FilePaths {
 		fmt.Printf("Path: %s\n", path)
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			fmt.Printf("  -> FILE DOES NOT EXIST!\n")
+			fmt.Printf("FILE DOES NOT EXIST!\n")
 		} else if err != nil {
-			fmt.Printf("  -> Error checking file: %v\n", err)
+			fmt.Printf("Error checking file: %v\n", err)
 		} else {
-			fmt.Printf("  -> File exists ✓\n")
+			fmt.Printf("File exists ✓\n")
 		}
 	}
 	fmt.Println("=================================")

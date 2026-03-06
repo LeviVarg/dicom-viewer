@@ -17,20 +17,20 @@ func ParseDicomFile(filePath string) (models.RawInstanceMetaData, error) {
 	// Check file info before parsing
 	fileInfo, statErr := os.Stat(filePath)
 	if statErr != nil {
-		fmt.Printf("  -> Error getting file info: %v\n", statErr)
+		fmt.Printf("Error getting file info: %v\n", statErr)
 		return models.RawInstanceMetaData{FilePath: filePath, Error: statErr}, statErr
 	} else {
-		fmt.Printf("  -> File size: %d bytes\n", fileInfo.Size())
+		fmt.Printf("File size: %d bytes\n", fileInfo.Size())
 	}
 
 	dataset, err := dicom.ParseFile(filePath, nil)
 
 	if err != nil {
-		fmt.Printf("  -> PARSE ERROR: %v\n", err)
+		fmt.Printf("PARSE ERROR: %v\n", err)
 		return models.RawInstanceMetaData{FilePath: filePath, Error: err}, err
 	}
 
-	fmt.Printf("  -> Parse successful, dataset has %d elements\n", len(dataset.Elements))
+	fmt.Printf("Parse successful, dataset has %d elements\n", len(dataset.Elements))
 
 	return models.RawInstanceMetaData{
 		PatientUID:       getString(dataset, tag.PatientID),
@@ -64,18 +64,16 @@ func ParseDicomFile(filePath string) (models.RawInstanceMetaData, error) {
 func getString(dataset dicom.Dataset, t tag.Tag) string {
 	element, err := dataset.FindElementByTag(t)
 	if err != nil {
-		// Don't log "element not found" errors as they're expected for optional tags
+		// Don't log errors as they're expected for optional tags
 		return ""
 	}
 
 	value := element.Value.String()
 
 	// The DICOM library returns values wrapped in brackets like "[value]"
-	// Strip them to get the actual value
 	value = strings.TrimPrefix(value, "[")
 	value = strings.TrimSuffix(value, "]")
 
-	// Trim any whitespace
 	value = strings.TrimSpace(value)
 
 	return value
@@ -89,7 +87,6 @@ func getInt(dataset dicom.Dataset, t tag.Tag) int {
 
 	value := element.Value.String()
 
-	// Strip brackets from the value
 	value = strings.TrimPrefix(value, "[")
 	value = strings.TrimSuffix(value, "]")
 	value = strings.TrimSpace(value)

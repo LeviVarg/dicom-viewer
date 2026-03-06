@@ -27,16 +27,16 @@ public class Patient {
     private Long id;
 
     @Column(name = "patient_dicom_id", length = 64)
-    private String patientDicomId; // DICOM PatientID (0010,0020)
+    private String patientDicomId;
 
     @Column(name = "patient_name", length = 255)
-    private String patientName; // DICOM PatientName (0010,0010)
+    private String patientName;
 
     @Column(name = "patient_birth_date", length = 32)
-    private String patientBirthDate; // DICOM PatientBirthDate (0010,0030) - YYYYMMDD (increased for safety)
+    private String patientBirthDate;
 
     @Column(name = "patient_sex", length = 32)
-    private String patientSex; // DICOM PatientSex (0010,0040) - M, F, O (increased for safety)
+    private String patientSex;
 
     @OneToMany(
         mappedBy = "patient",

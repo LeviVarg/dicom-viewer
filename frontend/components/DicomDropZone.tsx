@@ -6,6 +6,7 @@ import { Upload } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { fileUpload } from "@/app/upload/fileupload.actions";
+import { useTheme } from "@/lib/theme-context";
 
 // Maximum size per batch in bytes since nextjs only allows 1mb per request
 const MAX_BATCH_SIZE = 900 * 1024; // 900KB
@@ -56,6 +57,7 @@ function splitFilesIntoBatches(files: File[], maxBatchSize: number): File[][] {
 }
 
 export function DicomDropzone() {
+  const { theme } = useTheme();
   const [files, setFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
     currentBatch: 0,
@@ -111,7 +113,7 @@ export function DicomDropzone() {
     let errorCount = 0;
     const errors: string[] = [];
 
-    // Upload each batch 
+    // Upload each batch
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       const batchNumber = i + 1;
@@ -179,30 +181,44 @@ export function DicomDropzone() {
   const estimatedBatches =
     files.length > 0 ? splitFilesIntoBatches(files, MAX_BATCH_SIZE).length : 0;
 
+  // E-ink theme border colors
+  const borderColorActive = theme.mode === "dark" ? "#6b7280" : "#6b7280";
+  const borderColorInactive = theme.mode === "dark" ? "#4b5563" : "#d1d5db";
+  const dragActiveBg = theme.mode === "dark" ? "#1f2937" : "#f3f4f6";
+  const progressBarColor = theme.mode === "dark" ? "#9ca3af" : "#4b5563";
+
   return (
     <Card
       {...getRootProps({ className: "dropzone" })}
-      className={`
-        border-2 border-dashed transition-colors
-        ${isDragActive ? "border-indigo-600 bg-indigo-50" : "border-gray-300 hover:border-gray-400"}
-        ${files.length > 0 ? "min-h-[100px]" : ""}
-      `}
+      className="border-2 border-dashed transition-colors"
+      style={{
+        borderColor: isDragActive ? borderColorActive : borderColorInactive,
+        backgroundColor: isDragActive ? dragActiveBg : "transparent",
+      }}
     >
-      <CardContent className="flex flex-col gap-3 items-center justify-center p-6 w-4xl h-4xl">
+      <CardContent
+        className={`flex flex-col gap-3 items-center justify-center p-6 w-4xl h-4xl ${theme.colors.background} ${files.length > 0 ? "min-h-[100px]" : ""}`}
+      >
         <Input {...getInputProps()} />
 
         {files.length > 0 ? (
           <div className="w-full">
-            <h4 className="text-md font-semibold mb-2 text-center">
+            <h4
+              className={`text-md font-semibold mb-2 text-center ${theme.colors.text.primary}`}
+            >
               Selected DICOM Files ({files.length}):
             </h4>
-            <p className="text-xs text-gray-500 text-center mb-2">
+            <p
+              className={`text-xs ${theme.colors.text.secondary} text-center mb-2`}
+            >
               Total size: {totalSizeDisplay} • Will upload in {estimatedBatches}{" "}
               batch{estimatedBatches > 1 ? "es" : ""}
             </p>
-            <ul className="list-inside space-y-1 text-left px-4 max-h-40 overflow-y-auto list-none">
+            <ul
+              className={`list-inside space-y-1 text-left px-4 max-h-40 overflow-y-auto list-none ${theme.colors.text.primary}`}
+            >
               {files.map((file) => (
-                <li key={file.name} className="text-sm truncate text-gray-700">
+                <li key={file.name} className="text-sm truncate">
                   {file.name} - {Math.round(file.size / 1024)} KB
                 </li>
               ))}
@@ -210,19 +226,31 @@ export function DicomDropzone() {
           </div>
         ) : isDragActive ? (
           <>
-            <Upload className="w-8 h-8 text-indigo-500 mb-4" />
-            <p className="font-semibold text-lg text-indigo-700">
+            <Upload
+              className="w-8 h-8 mb-4"
+              style={{
+                color: theme.mode === "dark" ? "#9ca3af" : "#6b7280",
+              }}
+            />
+            <p className={`font-semibold text-lg ${theme.colors.text.primary}`}>
               Drop the DICOM files here...
             </p>
           </>
         ) : (
           <>
-            <Upload className="w-8 h-8 text-gray-400 mb-4" />
+            <Upload
+              className="w-8 h-8 mb-4"
+              style={{
+                color: theme.mode === "dark" ? "#6b7280" : "#9ca3af",
+              }}
+            />
             <div className="text-center">
-              <p className="text-sm font-semibold mb-1">
-                Drag 'n' drop files here
+              <p
+                className={`text-sm font-semibold mb-1 ${theme.colors.text.primary}`}
+              >
+                Drag &apos;n&apos; drop files here
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className={`text-xs ${theme.colors.text.secondary}`}>
                 or click to select DICOM files (.dcm)
               </p>
             </div>
@@ -232,14 +260,22 @@ export function DicomDropzone() {
         {/* Upload Progress */}
         {uploadProgress.isUploading && (
           <div className="w-full text-center">
-            <div className="text-sm font-medium text-blue-600 mb-2">
+            <div
+              className={`text-sm font-medium mb-2 ${theme.colors.text.secondary}`}
+            >
               Uploading batch {uploadProgress.currentBatch} of{" "}
               {uploadProgress.totalBatches}...
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="w-full rounded-full h-2"
+              style={{
+                backgroundColor: theme.mode === "dark" ? "#374151" : "#e5e7eb",
+              }}
+            >
               <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                className="h-2 rounded-full transition-all duration-300"
                 style={{
+                  backgroundColor: progressBarColor,
                   width: `${(uploadProgress.currentBatch / uploadProgress.totalBatches) * 100}%`,
                 }}
               />
@@ -248,7 +284,10 @@ export function DicomDropzone() {
         )}
 
         <div
-          className="mt-3 inline-block px-4 py-2 bg-gray-100 border rounded-md text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer"
+          className={`mt-3 inline-block px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors border ${theme.colors.button.background} ${theme.colors.button.text} ${theme.colors.button.hover}`}
+          style={{
+            borderColor: borderColorInactive,
+          }}
           onClick={(e) => {
             e.stopPropagation();
             open();
@@ -264,7 +303,10 @@ export function DicomDropzone() {
               uploadAction();
             }}
             disabled={uploadProgress.isUploading}
-            className="px-4 py-2 bg-blue-400 rounded-md text-small hover:bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${theme.colors.button.background} ${theme.colors.button.text} ${theme.colors.button.hover}`}
+            style={{
+              borderColor: borderColorInactive,
+            }}
           >
             {uploadProgress.isUploading ? "Uploading..." : "Upload"}
           </button>
@@ -275,7 +317,10 @@ export function DicomDropzone() {
               setFiles([]);
             }}
             disabled={uploadProgress.isUploading}
-            className="px-4 py-2 bg-blue-400 rounded-md text-small hover:bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${theme.colors.button.background} ${theme.colors.button.text} ${theme.colors.button.hover}`}
+            style={{
+              borderColor: borderColorInactive,
+            }}
           >
             Clear files
           </button>

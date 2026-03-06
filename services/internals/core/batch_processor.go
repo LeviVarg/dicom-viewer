@@ -106,8 +106,7 @@ func summarizeResults(resultChan <-chan models.RawInstanceMetaData) models.Parse
 		)
 	}
 
-	// Now build the nested structure: Series -> Studies -> Patients
-	// First, add all series to their respective studies
+	// Build the nested structure: Series -> Studies -> Patients
 	for _, series := range seriesMap {
 		study := studiesMap[series.StudyInstanceUID]
 		if study != nil {
