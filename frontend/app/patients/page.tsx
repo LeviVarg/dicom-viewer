@@ -8,6 +8,7 @@ import {
 } from "./actions/patients.actions";
 import { PatientDto, SeriesDto, StudyDto } from "@/lib/types";
 import { useTheme } from "@/lib/theme-context";
+import { Header } from "@/components/Header";
 
 // Dynamically import DicomViewer to avoid SSR issues with Cornerstone
 const DicomViewer = dynamic(() => import("@/components/DicomViewer"), {
@@ -117,14 +118,15 @@ const PatientsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${theme.colors.background}`}
-      >
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4"></div>
-          <p className={`${theme.colors.text.primary} text-lg`}>
-            Loading patients...
-          </p>
+      <div className={`min-h-screen flex flex-col ${theme.colors.background}`}>
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mx-auto mb-4"></div>
+            <p className={`${theme.colors.text.primary} text-lg`}>
+              Loading patients...
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -132,18 +134,21 @@ const PatientsPage: React.FC = () => {
 
   if (error) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${theme.colors.background}`}
-      >
-        <div className={`text-center ${theme.colors.error}`}>
-          <p className={`text-xl font-semibold mb-2`}>Error Loading Patients</p>
-          <p>{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className={`mt-4 px-4 py-2 ${theme.colors.button.background} ${theme.colors.button.text} rounded-2xl ${theme.colors.button.hover} transition-colors`}
-          >
-            Retry
-          </button>
+      <div className={`min-h-screen flex flex-col ${theme.colors.background}`}>
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className={`text-center ${theme.colors.error}`}>
+            <p className={`text-xl font-semibold mb-2`}>
+              Error Loading Patients
+            </p>
+            <p>{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className={`mt-4 px-4 py-2 ${theme.colors.button.background} ${theme.colors.button.text} rounded-2xl ${theme.colors.button.hover} transition-colors`}
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -151,8 +156,9 @@ const PatientsPage: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen ${theme.colors.background} ${theme.colors.text.primary}`}
+      className={`min-h-screen flex flex-col ${theme.colors.background} ${theme.colors.text.primary}`}
     >
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">DICOM Patients</h1>
 
