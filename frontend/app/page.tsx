@@ -1,63 +1,137 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useTheme } from "@/lib/theme-context";
+import { Header } from "@/components/Header";
 
 export default function Home() {
+  const { theme } = useTheme();
+
+  const isLight = theme.mode === "light";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className={`min-h-screen flex flex-col ${theme.colors.background}`}>
+      <Header />
+
+      {/* Hero */}
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2">
+        {/* ── Left: MRI image panel ── */}
+        <div className="relative overflow-hidden bg-black flex items-center justify-center min-h-[400px]">
+          {/* The MRI image */}
+          <Image
+            src="/brain_mri.jpg"
+            alt="Brain MRI scan"
+            fill
+            className="object-cover opacity-80 animate-flicker"
+            priority
+          />
+
+          {/* Subtle dark vignette so edges fade to black */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%)",
+            }}
+          />
+
+          {/* Scan line */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div
+              className="animate-scan absolute left-0 right-0 h-0.5"
+              style={{
+                background:
+                  "linear-gradient(to right, transparent, rgba(255,255,255,0.18), rgba(255,255,255,0.35), rgba(255,255,255,0.18), transparent)",
+                boxShadow: "0 0 12px 2px rgba(255,255,255,0.12)",
+              }}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          {/* Corner annotation — mimics DICOM viewer metadata */}
+          <div className="absolute top-4 left-4 font-mono text-xs text-white/40 space-y-0.5 select-none">
+            <p>SERIES 01 / 24</p>
+            <p>TR: 4500ms TE: 90ms</p>
+            <p>1.5T AXIAL T2</p>
+          </div>
+          <div className="absolute bottom-4 right-4 font-mono text-xs text-white/40 select-none text-right">
+            <p>W: 400 L: 200</p>
+            <p>FOV: 220mm</p>
+          </div>
+
+          {/* Subtle horizontal CRT scanline texture */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to bottom, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px)",
+            }}
+          />
+        </div>
+
+        {/* ── Right: text content ── */}
+        <div
+          className={`flex flex-col justify-center px-12 py-16 lg:px-20 ${
+            isLight ? "bg-white" : "bg-gray-900"
+          }`}
+        >
+          {/* Eyebrow label */}
+          <p
+            className={`text-xs font-mono tracking-[0.2em] uppercase mb-6 ${theme.colors.text.muted}`}
           >
-            Documentation
-          </a>
+            Medical Imaging Platform
+          </p>
+
+          <h1
+            className={`text-4xl lg:text-5xl font-bold leading-tight tracking-tight mb-6 ${theme.colors.text.primary}`}
+          >
+            Upload your DICOM files
+            <br />
+            <span className={theme.colors.text.secondary}>for inspection.</span>
+          </h1>
+
+          <p
+            className={`text-base leading-relaxed mb-10 max-w-md ${theme.colors.text.secondary}`}
+          >
+            DICOM Viewer lets you upload and explore medical imaging files
+            directly in your browser. Organise studies by patient, browse
+            series, and inspect individual images — no additional software
+            required.
+          </p>
+
+          {/* Feature pills */}
+          <div className="flex flex-wrap gap-2 mb-12">
+            {["DICOM 3.0", "Multi-series", "In-browser", "Zero install"].map(
+              (tag) => (
+                <span
+                  key={tag}
+                  className={`px-3 py-1 rounded-full text-xs font-mono border ${theme.colors.border} ${theme.colors.text.muted}`}
+                >
+                  {tag}
+                </span>
+              ),
+            )}
+          </div>
+
+          {/* CTA buttons */}
+          <div className="flex items-center gap-3">
+            <Link href="/upload">
+              <span
+                className={`inline-block px-6 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer
+                  ${theme.colors.button.background} ${theme.colors.button.hover} ${theme.colors.button.text}`}
+              >
+                Upload files →
+              </span>
+            </Link>
+            <Link href="/patients">
+              <span
+                className={`inline-block px-6 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer border
+                  ${theme.colors.border} ${theme.colors.button.hover} ${theme.colors.text.secondary}`}
+              >
+                View patients
+              </span>
+            </Link>
+          </div>
         </div>
       </main>
     </div>
