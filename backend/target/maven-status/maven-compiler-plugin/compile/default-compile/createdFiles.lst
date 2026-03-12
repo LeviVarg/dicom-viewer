@@ -1,0 +1,10 @@
+com/levivarga/dicomviewerbackend/fileupload/FileStorageService.class
+com/levivarga/dicomviewerbackend/fileupload/FileStorageController.class
+com/levivarga/dicomviewerbackend/controller/PatientController.class
+com/levivarga/dicomviewerbackend/fileupload/StorageException.class
+com/levivarga/dicomviewerbackend/repository/PatientRepository.class
+com/levivarga/dicomviewerbackend/repository/StudyRepository.class
+com/levivarga/dicomviewerbackend/DicomViewerBackendApplication.class
+com/levivarga/dicomviewerbackend/fileupload/FileStorageServiceInterface.class
+com/levivarga/dicomviewerbackend/repository/SeriesRepository.class
+com/levivarga/dicomviewerbackend/repository/InstanceRepository.class
